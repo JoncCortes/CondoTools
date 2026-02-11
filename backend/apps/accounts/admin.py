@@ -6,4 +6,25 @@ from .models import User
 
 @admin.register(User)
 class UserAdmin(DjangoUserAdmin):
-    fieldsets = DjangoUserAdmin.fieldsets + (("Condomínio", {"fields": ("role", "condominium")}),)
+    model = User
+    ordering = ("email",)
+    list_display = ("email", "first_name", "last_name", "role", "condominium", "is_staff")
+    search_fields = ("email", "first_name", "last_name")
+
+    fieldsets = (
+        (None, {"fields": ("email", "password")}),
+        ("Informações pessoais", {"fields": ("first_name", "last_name")}),
+        ("Permissões", {"fields": ("is_active", "is_staff", "is_superuser", "groups", "user_permissions")}),
+        ("Condomínio", {"fields": ("role", "condominium")}),
+        ("Datas importantes", {"fields": ("last_login", "date_joined")}),
+    )
+
+    add_fieldsets = (
+        (
+            None,
+            {
+                "classes": ("wide",),
+                "fields": ("email", "password1", "password2", "role", "condominium", "is_staff", "is_superuser"),
+            },
+        ),
+    )
