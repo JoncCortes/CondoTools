@@ -8,6 +8,8 @@ from apps.packages.models import Package
 from apps.residents.models import Resident
 from apps.settings_menu.models import MenuCategory, MenuItem
 from apps.staff.models import Staff
+from apps.visitors.models import Visitor, VisitorAuditLog
+from apps.service_providers.models import ServiceProvider, ServiceProviderAuditLog
 from apps.units.models import Unit
 
 
@@ -64,6 +66,13 @@ class Command(BaseCommand):
 
         CommonArea.objects.get_or_create(condominium=condo, name="Salão de festas", defaults={"description": "Espaço para eventos"})
         CommonArea.objects.get_or_create(condominium=condo, name="Churrasqueira", defaults={"description": "Área gourmet"})
+
+
+        visitor, _ = Visitor.objects.get_or_create(condominium=condo, full_name="Visitante Demo", document="999999999", unit=unit101, defaults={"authorized_by":"Portaria", "is_active":True})
+        VisitorAuditLog.objects.get_or_create(condominium=condo, visitor=visitor, visitor_name=visitor.full_name, document=visitor.document, unit=visitor.unit, defaults={"status":"INSIDE", "registered_by":porteiro})
+
+        provider, _ = ServiceProvider.objects.get_or_create(condominium=condo, provider_name="Eletricista Demo", service_type="Elétrica", unit=unit102, defaults={"company":"Serviços XYZ", "authorized_by":"Síndico", "status":"ACTIVE"})
+        ServiceProviderAuditLog.objects.get_or_create(condominium=condo, service_provider=provider, provider_name=provider.provider_name, service_type=provider.service_type, unit=provider.unit, defaults={"status":"ACTIVE", "registered_by":porteiro})
 
         Package.objects.get_or_create(
             condominium=condo,

@@ -24,6 +24,9 @@ def resolve_condominium_for_create(*, request, user: User, payload_condominium):
             return payload_condominium
         condo_id = get_active_condominium_id(request)
         if condo_id:
-            return Condominium.objects.filter(pk=condo_id).first()
-        raise ValidationError({"condominium": ["Selecione um condomínio ativo para criar este registro."]})
+            condo = Condominium.objects.filter(pk=condo_id).first()
+            if condo:
+                return condo
+            raise ValidationError({"condominium": ["Condomínio ativo inválido."]})
+        raise ValidationError({"condominium": ["Selecione um condomínio ativo."]})
     return user.condominium

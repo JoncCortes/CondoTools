@@ -11,9 +11,10 @@ from apps.common.dashboard import DashboardSummaryView
 from apps.common_areas.views import CommonAreaViewSet
 from apps.condominiums.views import CondominiumViewSet
 from apps.incidents.views import IncidentViewSet
-from apps.packages.views import PackageViewSet
+from apps.packages.views import PackageAuditLogViewSet, PackageViewSet
 from apps.reservations.views import ReservationViewSet
 from apps.residents.views import ResidentViewSet
+from apps.service_providers.views import ServiceProviderAuditLogViewSet, ServiceProviderViewSet
 from apps.settings_menu.views import (
     CustomPageViewSet,
     MenuCategoryViewSet,
@@ -24,7 +25,7 @@ from apps.settings_menu.views import (
 from apps.staff.views import StaffViewSet
 from apps.units.views import UnitViewSet
 from apps.visit_logs.views import VisitLogViewSet
-from apps.visitors.views import VisitorViewSet
+from apps.visitors.views import VisitorAuditLogViewSet, VisitorViewSet
 
 router = DefaultRouter()
 router.register("users", UserViewSet, basename="users")
@@ -33,8 +34,12 @@ router.register("units", UnitViewSet, basename="units")
 router.register("residents", ResidentViewSet, basename="residents")
 router.register("staff", StaffViewSet, basename="staff")
 router.register("visitors", VisitorViewSet, basename="visitors")
+router.register("visitor-logs", VisitorAuditLogViewSet, basename="visitor-logs")
+router.register("service-providers", ServiceProviderViewSet, basename="service-providers")
+router.register("service-provider-logs", ServiceProviderAuditLogViewSet, basename="service-provider-logs")
 router.register("visit-logs", VisitLogViewSet, basename="visit-logs")
 router.register("packages", PackageViewSet, basename="packages")
+router.register("package-logs", PackageAuditLogViewSet, basename="package-logs")
 router.register("announcements", AnnouncementViewSet, basename="announcements")
 router.register("incidents", IncidentViewSet, basename="incidents")
 router.register("common-areas", CommonAreaViewSet, basename="common-areas")

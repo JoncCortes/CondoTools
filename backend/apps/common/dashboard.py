@@ -12,6 +12,7 @@ from apps.incidents.models import Incident
 from apps.packages.models import Package
 from apps.reservations.models import Reservation
 from apps.residents.models import Resident
+from apps.service_providers.models import ServiceProviderAuditLog
 from apps.units.models import Unit
 from apps.visit_logs.models import VisitLog
 
@@ -30,13 +31,13 @@ class DashboardSummaryView(APIView):
         if not condo_id:
             return Response(
                 {
-                    "units_total": 0,
-                    "residents_total": 0,
+                    "total_units": 0,
+                    "total_residents": 0,
                     "visitors_today": 0,
+                    "service_providers_today": 0,
                     "packages_pending": 0,
                     "incidents_open": 0,
                     "reservations_upcoming": 0,
-                    "common_areas_total": 0,
                     "message": "Selecione um condomínio ativo.",
                 }
             )
@@ -45,16 +46,22 @@ class DashboardSummaryView(APIView):
         in_7_days = timezone.now() + timedelta(days=7)
 
         data = {
-            "units_total": Unit.objects.filter(condominium_id=condo_id).count(),
-            "residents_total": Resident.objects.filter(condominium_id=condo_id).count(),
+            "total_units": Unit.objects.filter(condominium_id=condo_id).count(),
+            "total_residents": Resident.objects.filter(condominium_id=condo_id).count(),
             "visitors_today": VisitLog.objects.filter(condominium_id=condo_id, entry_at__gte=today_start).count(),
-            "packages_pending": Package.objects.filter(condominium_id=condo_id, delivered_at__isnull=True).count(),
+            "service_providers_today": ServiceProviderAuditLog.objects.filter(
+                condominium_id=condo_id,
+                created_at__gte=today_start,
+            ).count(),
+            "packages_pending": Package.objects.filter(condominium_id=condo_id, status="PENDING").count(),
             "incidents_open": Incident.objects.filter(condominium_id=condo_id, status__iexact="OPEN").count(),
             "reservations_upcoming": Reservation.objects.filter(
                 condominium_id=condo_id,
                 start_at__gte=timezone.now(),
                 start_at__lte=in_7_days,
             ).count(),
-            "common_areas_total": CommonArea.objects.filter(condominium_id=condo_id).count(),
         }
+        data["common_areas_total"] = CommonArea.objects.filter(condominium_id=condo_id).count()
+        data["units_total"] = data["total_units"]
+        data["residents_total"] = data["total_residents"]
         return Response(data)

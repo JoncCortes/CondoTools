@@ -21,6 +21,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "rest_framework_simplejwt",
     "drf_spectacular",
+    "django_filters",
     "apps.common",
     "apps.accounts",
     "apps.audit",
@@ -36,6 +37,7 @@ INSTALLED_APPS = [
     "apps.reservations",
     "apps.visit_logs",
     "apps.settings_menu",
+    "apps.service_providers",
 ]
 
 MIDDLEWARE = [
@@ -91,7 +93,7 @@ REST_FRAMEWORK = {
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 20,
-    "DEFAULT_FILTER_BACKENDS": ["rest_framework.filters.SearchFilter", "rest_framework.filters.OrderingFilter"],
+    "DEFAULT_FILTER_BACKENDS": ["django_filters.rest_framework.DjangoFilterBackend", "rest_framework.filters.SearchFilter", "rest_framework.filters.OrderingFilter"],
 }
 
 SIMPLE_JWT = {
