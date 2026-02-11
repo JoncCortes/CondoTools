@@ -17,10 +17,11 @@ export const pagePermissions = {
   '/common-areas': [ROLES.PLATFORM_ADMIN, ROLES.SINDICO, ROLES.MORADOR],
   '/reservations': [ROLES.PLATFORM_ADMIN, ROLES.SINDICO, ROLES.MORADOR],
   '/profile': [ROLES.PLATFORM_ADMIN, ROLES.SINDICO, ROLES.PORTEIRO, ROLES.MORADOR],
+  '/settings': [ROLES.PLATFORM_ADMIN],
 }
 
-export const menuByRole = {
-  [ROLES.PLATFORM_ADMIN]: ['/dashboard', '/units', '/residents', '/visitors', '/visit-logs', '/packages', '/announcements', '/incidents', '/common-areas', '/reservations', '/profile'],
+export const staticMenuByRole = {
+  [ROLES.PLATFORM_ADMIN]: ['/dashboard', '/units', '/residents', '/visitors', '/visit-logs', '/packages', '/announcements', '/incidents', '/common-areas', '/reservations', '/profile', '/settings'],
   [ROLES.SINDICO]: ['/dashboard', '/units', '/residents', '/visitors', '/visit-logs', '/packages', '/announcements', '/incidents', '/common-areas', '/reservations', '/profile'],
   [ROLES.PORTEIRO]: ['/dashboard', '/visitors', '/visit-logs', '/packages', '/profile'],
   [ROLES.MORADOR]: ['/dashboard', '/packages', '/announcements', '/incidents', '/reservations', '/profile'],

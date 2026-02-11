@@ -34,6 +34,8 @@ INSTALLED_APPS = [
     "apps.incidents",
     "apps.common_areas",
     "apps.reservations",
+    "apps.visit_logs",
+    "apps.settings_menu",
 ]
 
 MIDDLEWARE = [

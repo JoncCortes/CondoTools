@@ -3,10 +3,12 @@ import { createBrowserRouter, Navigate } from 'react-router-dom'
 import { resources } from '../api/resources'
 import { ProtectedRoute } from '../components/ProtectedRoute'
 import { AppLayout } from '../layouts/AppLayout'
+import { CustomPage } from '../pages/CustomPage'
 import { DashboardPage } from '../pages/DashboardPage'
 import { EntityPage } from '../pages/EntityPage'
 import { LoginPage } from '../pages/LoginPage'
 import { ProfilePage } from '../pages/ProfilePage'
+import { SettingsPage } from '../pages/SettingsPage'
 
 const entity = (cfg) => <EntityPage config={cfg} />
 
@@ -30,6 +32,8 @@ export const router = createBrowserRouter([
           { path: '/common-areas', element: entity(resources.commonAreas) },
           { path: '/reservations', element: entity(resources.reservations) },
           { path: '/profile', element: <ProfilePage /> },
+          { path: '/settings', element: <SettingsPage /> },
+          { path: '/pages/:slug', element: <CustomPage /> },
         ],
       },
     ],

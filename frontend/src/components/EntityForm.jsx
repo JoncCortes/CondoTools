@@ -11,12 +11,20 @@ export function EntityForm({ fields, values, onChange, onSubmit, submitLabel = '
       {fields.map((field) => (
         <div key={field.name} className="field-wrap">
           <label>{field.label}{field.required ? ' *' : ''}</label>
-          <input
-            type={field.type || 'text'}
-            value={values[field.name] ?? ''}
-            onChange={(e) => onChange(field.name, e.target.value)}
-            placeholder={field.label}
-          />
+          {field.type === 'textarea' ? (
+            <textarea
+              value={values[field.name] ?? ''}
+              onChange={(e) => onChange(field.name, e.target.value)}
+              placeholder={field.label}
+            />
+          ) : (
+            <input
+              type={field.type || 'text'}
+              value={values[field.name] ?? ''}
+              onChange={(e) => onChange(field.name, e.target.value)}
+              placeholder={field.label}
+            />
+          )}
         </div>
       ))}
       <button type="submit" disabled={loading || hasErrors}>{loading ? 'Salvando...' : submitLabel}</button>

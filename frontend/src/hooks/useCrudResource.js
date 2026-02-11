@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 
 import { api } from '../api/client'
+import { extractApiError } from '../utils/apiError'
 
 export function useCrudResource(endpoint) {
   const [items, setItems] = useState([])
@@ -17,8 +18,8 @@ export function useCrudResource(endpoint) {
       const { data } = await api.get(`${endpoint}?page=${targetPage}`)
       setItems(data.results || [])
       setCount(data.count || 0)
-    } catch {
-      setError('Falha ao carregar dados.')
+    } catch (err) {
+      setError(extractApiError(err))
     } finally {
       setLoading(false)
     }
@@ -40,13 +41,29 @@ export function useCrudResource(endpoint) {
       }
       await load(page)
       return true
-    } catch {
-      setError('Falha ao salvar registro.')
+    } catch (err) {
+      setError(extractApiError(err))
       return false
     } finally {
       setLoading(false)
     }
   }
 
-  return { items, count, page, setPage, loading, error, success, save, reload: load }
+  const remove = async (id) => {
+    setLoading(true)
+    setError('')
+    try {
+      await api.delete(`${endpoint}${id}/`)
+      setSuccess('Registro removido com sucesso.')
+      await load(page)
+      return true
+    } catch (err) {
+      setError(extractApiError(err))
+      return false
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return { items, count, page, setPage, loading, error, success, save, remove, reload: load }
 }

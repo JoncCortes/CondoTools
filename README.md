@@ -17,17 +17,18 @@ Monorepo com backend Django/DRF (multi-tenant) e frontend React/Vite, pronto par
 ### Backend (Render Web Service)
 - `SECRET_KEY`
 - `DEBUG` (`False` em produção)
-- `DATABASE_URL` (fornecida pelo banco Postgres do Render)
-- `CORS_ALLOWED_ORIGINS` (ex.: URL do frontend no Render)
-- `RENDER_EXTERNAL_HOSTNAME` (host público do backend no Render)
-- `DJANGO_SETTINGS_MODULE` (`config.settings.production` no Render)
-- `ALLOWED_HOSTS` (opcional; padrão local `localhost,127.0.0.1`)
+- `DATABASE_URL`
+- `CORS_ALLOWED_ORIGINS`
+- `RENDER_EXTERNAL_HOSTNAME`
+- `DJANGO_SETTINGS_MODULE` (`config.settings.production`)
+- `ALLOWED_HOSTS` (opcional)
 
-### Frontend (Render Static Site)
+### Frontend
 - `VITE_API_URL` (ex.: `https://<backend>.onrender.com/api`)
 
-## Backend local
+## Rodar local
 
+### Backend
 ```bash
 cd backend
 python -m venv .venv
@@ -40,8 +41,7 @@ python manage.py seed
 python manage.py runserver
 ```
 
-## Frontend local
-
+### Frontend
 ```bash
 cd frontend
 cp .env.example .env
@@ -49,39 +49,28 @@ npm install
 npm run dev
 ```
 
-## Deploy no Render (Blueprint)
+## Login seed
+- `admin@platform.com` / `123456`
+- `sindico@aurora.com` / `123456`
+- `porteiro@aurora.com` / `123456`
+- `morador@aurora.com` / `123456`
 
-1. Faça push do repositório para o GitHub.
-2. No Render: **New + Blueprint** e selecione o repositório.
-3. O `render.yaml` criará:
-   - **Postgres Database** (`condotools-db`)
-   - **Backend Web Service** (Django + Gunicorn)
-   - **Frontend Static Site** (serviço `type: web` com `env: static` no Blueprint)
-4. O backend usa no build:
-   - `pip install -r requirements.txt && python manage.py collectstatic --noinput && python manage.py migrate`
-5. O backend inicia com:
-   - `gunicorn config.wsgi:application`
-6. O frontend builda com:
-   - `npm ci && npm run build`
-   e publica `dist`.
+## Condomínio ativo (PLATFORM_ADMIN)
+- No topo do app existe um seletor “Condomínio ativo”.
+- Essa seleção é persistida no `localStorage`.
+- O frontend envia `X-CONDOMINIUM-ID` automaticamente para recursos condo-scoped.
+- Sem condomínio ativo, páginas condo-scoped ficam vazias e operações de criação retornam erro claro.
 
-## Pós-deploy: migrations e seed
+## Deploy Render
+1. Push no GitHub
+2. New + Blueprint
+3. O `render.yaml` cria Postgres + backend + frontend static.
+4. Build backend executa install + collectstatic + migrate.
+5. Build frontend executa `npm ci && npm run build` e publica `dist`.
 
-Após o primeiro deploy do backend no Render:
-
-1. Abra o **Shell** do serviço backend.
-2. Rode:
-
+## Pós deploy
+No Shell do backend:
 ```bash
 python manage.py migrate
 python manage.py seed
 ```
-
-> Observação: o `buildCommand` já executa `migrate`; esses comandos acima são úteis para reaplicar/manualmente e para seed inicial.
-
-## Endpoints úteis
-
-- JWT login: `POST /api/auth/token/`
-- JWT refresh: `POST /api/auth/token/refresh/`
-- Swagger: `/api/docs/`
-- OpenAPI schema: `/api/schema/`

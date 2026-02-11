@@ -1,4 +1,4 @@
-from django.db import connection
+from django.db import OperationalError, ProgrammingError, connection
 from django.db.models.signals import post_delete, post_save, pre_save
 from django.dispatch import receiver
 
@@ -19,6 +19,8 @@ _ALLOWED_APP_LABELS = {
     "incidents",
     "common_areas",
     "reservations",
+    "visit_logs",
+    "settings_menu",
 }
 
 
@@ -39,6 +41,14 @@ def _audit_table_exists() -> bool:
         return False
 
 
+def _safe_create_audit(**kwargs):
+    try:
+        AuditLog.objects.create(**kwargs)
+    except (ProgrammingError, OperationalError):
+        # During initial migrate/deploy the audit table may not exist yet.
+        return
+
+
 @receiver(pre_save)
 def cache_previous_state(sender, instance, **kwargs):
     if not _should_audit(sender) or not instance.pk or not _audit_table_exists():
@@ -56,7 +66,7 @@ def cache_previous_state(sender, instance, **kwargs):
 
 @receiver(post_save)
 def create_or_update_audit(sender, instance, created, raw=False, **kwargs):
-    if raw or not _should_audit(sender) or not _audit_table_exists():
+    if raw or not _should_audit(sender):
         return
 
     user = get_current_user()
@@ -68,7 +78,10 @@ def create_or_update_audit(sender, instance, created, raw=False, **kwargs):
             if str(old_val) != str(new_val):
                 changes[field] = {"old": str(old_val), "new": str(new_val)}
 
-    AuditLog.objects.create(
+    if not _audit_table_exists():
+        return
+
+    _safe_create_audit(
         user=user,
         action="CREATE" if created else "UPDATE",
         model=sender.__name__,
@@ -84,7 +97,7 @@ def delete_audit(sender, instance, **kwargs):
         return
 
     user = get_current_user()
-    AuditLog.objects.create(
+    _safe_create_audit(
         user=user,
         action="DELETE",
         model=sender.__name__,

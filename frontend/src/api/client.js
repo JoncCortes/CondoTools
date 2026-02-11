@@ -24,15 +24,16 @@ export async function fetchCurrentUser() {
 }
 
 api.interceptors.request.use((config) => {
-  const { accessToken } = useAuthStore.getState()
+  const { accessToken, activeCondominiumId } = useAuthStore.getState()
   if (accessToken) config.headers.Authorization = `Bearer ${accessToken}`
+  if (activeCondominiumId) config.headers['X-CONDOMINIUM-ID'] = activeCondominiumId
   return config
 })
 
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
-    const original = error.config
+    const original = error.config || {}
     const status = error.response?.status
     const { refreshToken, clearAuth, setTokens } = useAuthStore.getState()
 
@@ -41,10 +42,8 @@ api.interceptors.response.use(
     }
 
     if (isRefreshing) {
-      return new Promise((resolve, reject) => {
-        queue.push({ resolve, reject })
-      }).then((token) => {
-        original.headers.Authorization = `Bearer ${token}`
+      return new Promise((resolve, reject) => queue.push({ resolve, reject })).then((token) => {
+        original.headers = { ...(original.headers || {}), Authorization: `Bearer ${token}` }
         return api(original)
       })
     }
@@ -56,7 +55,7 @@ api.interceptors.response.use(
       const { data } = await rawClient.post('/auth/token/refresh/', { refresh: refreshToken })
       setTokens({ access: data.access, refresh: refreshToken })
       flushQueue(null, data.access)
-      original.headers.Authorization = `Bearer ${data.access}`
+      original.headers = { ...(original.headers || {}), Authorization: `Bearer ${data.access}` }
       return api(original)
     } catch (err) {
       flushQueue(err, null)
