@@ -1,10 +1,18 @@
 import { useMemo } from 'react'
 
-export function EntityForm({ fields, values, onChange, onSubmit, submitLabel = 'Salvar', loading }) {
+export function EntityForm({ fields, values, errors = {}, onChange, onSubmit, submitLabel = 'Salvar', loading }) {
   const hasErrors = useMemo(
     () => fields.some((f) => f.required && !String(values[f.name] ?? '').trim()),
     [fields, values],
   )
+
+  const errorText = (fieldName) => {
+    const value = errors?.[fieldName]
+    if (!value) return ''
+    if (Array.isArray(value)) return value.join(', ')
+    if (typeof value === 'string') return value
+    return ''
+  }
 
   return (
     <form className="form-grid" onSubmit={onSubmit}>
@@ -35,6 +43,7 @@ export function EntityForm({ fields, values, onChange, onSubmit, submitLabel = '
               placeholder={field.label}
             />
           )}
+          {errorText(field.name) ? <small className="field-error">{errorText(field.name)}</small> : null}
         </div>
       ))}
       <button type="submit" disabled={loading || hasErrors}>{loading ? 'Salvando...' : submitLabel}</button>

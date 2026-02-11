@@ -1,9 +1,11 @@
 from rest_framework import serializers
 
+from apps.common.serializers import CondoScopedSerializerMixin
+
 from .models import ServiceProvider, ServiceProviderAuditLog
 
 
-class ServiceProviderSerializer(serializers.ModelSerializer):
+class ServiceProviderSerializer(CondoScopedSerializerMixin, serializers.ModelSerializer):
     class Meta:
         model = ServiceProvider
         fields = "__all__"

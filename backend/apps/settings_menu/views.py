@@ -4,6 +4,7 @@ from rest_framework.response import Response
 
 from apps.accounts.models import User
 from apps.common.permissions import IsPlatformAdmin
+from apps.common.tenant import get_active_condominium_id
 
 from .models import CustomPage, MenuCategory, MenuItem
 from .serializers import CustomPageSerializer, MenuCategorySerializer, MenuItemSerializer
@@ -19,8 +20,22 @@ class MenuCategoryViewSet(AdminOnlyModelViewSet):
 
 
 class MenuItemViewSet(AdminOnlyModelViewSet):
-    queryset = MenuItem.objects.select_related("category")
+    queryset = MenuItem.objects.select_related("category", "condominium")
     serializer_class = MenuItemSerializer
+
+    @action(detail=True, methods=["post"], url_path="move-up")
+    def move_up(self, request, pk=None):
+        item = self.get_object()
+        item.order = max(item.order - 1, 0)
+        item.save(update_fields=["order"])
+        return Response(MenuItemSerializer(item).data)
+
+    @action(detail=True, methods=["post"], url_path="move-down")
+    def move_down(self, request, pk=None):
+        item = self.get_object()
+        item.order = item.order + 1
+        item.save(update_fields=["order"])
+        return Response(MenuItemSerializer(item).data)
 
 
 class CustomPageViewSet(AdminOnlyModelViewSet):
@@ -34,14 +49,24 @@ class PublicMenuViewSet(viewsets.ViewSet):
     def list(self, request):
         user: User = request.user
         role = user.role
-        items = MenuItem.objects.filter(enabled=True)
-        custom_pages = CustomPage.objects.filter(enabled=True)
+        condo_id = get_active_condominium_id(request) if (user.is_superuser or role == User.Role.PLATFORM_ADMIN) else user.condominium_id
+
+        global_items = MenuItem.objects.filter(enabled=True, condominium__isnull=True)
+        condo_items = MenuItem.objects.filter(enabled=True, condominium_id=condo_id) if condo_id else MenuItem.objects.none()
+
+        merged = {}
+        for item in global_items:
+            merged[item.key] = item
+        for item in condo_items:
+            merged[item.key] = item
 
         visible_items = [
             MenuItemSerializer(item).data
-            for item in items
+            for item in sorted(merged.values(), key=lambda i: (i.order, i.id))
             if not item.allowed_roles or role in item.allowed_roles or user.is_superuser
         ]
+
+        custom_pages = CustomPage.objects.filter(enabled=True)
         visible_pages = [
             CustomPageSerializer(page).data
             for page in custom_pages

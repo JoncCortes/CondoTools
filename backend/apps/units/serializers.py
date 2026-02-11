@@ -1,9 +1,11 @@
 from rest_framework import serializers
 
+from apps.common.serializers import CondoScopedSerializerMixin
+
 from .models import Unit
 
 
-class UnitSerializer(serializers.ModelSerializer):
+class UnitSerializer(CondoScopedSerializerMixin, serializers.ModelSerializer):
     display_name = serializers.CharField(read_only=True)
     resident_count = serializers.SerializerMethodField(read_only=True)
 

@@ -23,7 +23,7 @@ function normalizePayload(payload, fields) {
 }
 
 export function EntityPage({ config }) {
-  const { items, count, page, setPage, loading, error, success, save, remove } = useCrudResource(config.endpoint)
+  const { items, count, page, setPage, loading, error, fieldErrors, success, save, remove } = useCrudResource(config.endpoint)
   const [createOpen, setCreateOpen] = useState(false)
   const [detailOpen, setDetailOpen] = useState(false)
   const [selected, setSelected] = useState(null)
@@ -132,6 +132,7 @@ export function EntityPage({ config }) {
           onChange={(name, value) => setFormValues((v) => ({ ...v, [name]: value }))}
           onSubmit={onSubmitCreate}
           loading={loading}
+          errors={fieldErrors}
         />
       </Modal>
 
@@ -155,6 +156,7 @@ export function EntityPage({ config }) {
             onSubmit={onSubmitEdit}
             submitLabel="Salvar alterações"
             loading={loading}
+            errors={fieldErrors}
           />
         )}
       </Modal>

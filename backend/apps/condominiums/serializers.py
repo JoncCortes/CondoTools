@@ -9,7 +9,7 @@ from .models import Condominium
 class CondominiumSerializer(serializers.ModelSerializer):
     class Meta:
         model = Condominium
-        fields = "__all__"
+        fields = ["id", "name", "document", "address"]
 
 
 class WizardSetupSerializer(serializers.Serializer):

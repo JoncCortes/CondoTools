@@ -1,10 +1,11 @@
-from rest_framework import permissions
+from rest_framework import permissions, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from apps.accounts.models import User
 from apps.common.permissions import IsPlatformAdmin
 from apps.common.viewsets import BaseCondoViewSet
+from apps.units.models import Unit
 
 from .models import Condominium
 from .serializers import (
@@ -28,11 +29,19 @@ class CondominiumViewSet(BaseCondoViewSet):
         return super().get_permissions()
 
     def get_queryset(self):
-        qs = super().get_queryset()
         user: User = self.request.user
         if user.is_superuser or user.role == User.Role.PLATFORM_ADMIN:
             return Condominium.objects.all()
         return Condominium.objects.filter(id=user.condominium_id)
+
+    def destroy(self, request, *args, **kwargs):
+        condominium = self.get_object()
+        if condominium.users.exists() or Unit.objects.filter(condominium=condominium).exists():
+            return Response(
+                {"detail": "Não é possível excluir este condomínio porque há dados vinculados."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        return super().destroy(request, *args, **kwargs)
 
     @action(detail=False, methods=["post"], url_path="wizard/setup")
     def wizard_setup(self, request):
@@ -41,7 +50,9 @@ class CondominiumViewSet(BaseCondoViewSet):
         data = serializer.validated_data
 
         if data.get("condominium_id"):
-            condominium = Condominium.objects.get(pk=data["condominium_id"])
+            condominium = Condominium.objects.filter(pk=data["condominium_id"]).first()
+            if not condominium:
+                return Response({"detail": "Condomínio não encontrado."}, status=status.HTTP_404_NOT_FOUND)
         else:
             condominium = Condominium.objects.create(
                 name=data["name"],
@@ -63,7 +74,7 @@ class CondominiumViewSet(BaseCondoViewSet):
                 "condominium_id": condominium.id,
                 "syndic_id": syndic.id,
             },
-            status=201,
+            status=status.HTTP_201_CREATED,
         )
 
     @action(detail=True, methods=["post"], url_path="bulk-units")
