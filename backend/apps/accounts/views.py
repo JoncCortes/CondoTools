@@ -2,10 +2,10 @@ from rest_framework import permissions, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
+from apps.accounts.models import User
 from apps.common.permissions import IsPlatformAdmin
 from apps.common.viewsets import BaseCondoViewSet
 
-from .models import User
 from .serializers import UserSerializer
 
 
@@ -18,6 +18,17 @@ class UserViewSet(BaseCondoViewSet):
         if self.action in {"create", "update", "partial_update", "destroy", "list", "set_password"}:
             return [permissions.IsAuthenticated(), IsPlatformAdmin()]
         return [permissions.IsAuthenticated()]
+
+    def get_queryset(self):
+        user: User = self.request.user
+        if user.is_superuser or user.role == User.Role.PLATFORM_ADMIN:
+            return self.queryset
+        return self.queryset.filter(condominium_id=user.condominium_id)
+
+    def perform_create(self, serializer):
+        # Users are managed by platform admins and may or may not belong to a condominium,
+        # so we must not force condominium injection from BaseCondoViewSet.
+        serializer.save()
 
     @action(detail=False, methods=["get"])
     def me(self, request):
