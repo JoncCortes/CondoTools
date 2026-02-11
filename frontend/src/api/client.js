@@ -1,6 +1,5 @@
 import axios from 'axios'
 import { useAuthStore } from '../store/authStore'
-import { parseJwt } from '../utils/jwt'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api'
 
@@ -16,10 +15,7 @@ function flushQueue(error, token = null) {
 }
 
 export async function fetchCurrentUser() {
-  const { accessToken } = useAuthStore.getState()
-  const payload = parseJwt(accessToken)
-  if (!payload?.user_id) return null
-  const { data } = await api.get(`/users/${payload.user_id}/`)
+  const { data } = await api.get('/users/me/')
   return data
 }
 
