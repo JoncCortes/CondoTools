@@ -28,11 +28,12 @@ services:
       - key: DJANGO_SETTINGS_MODULE
         value: config.settings.production
 
-  - type: static_site
+  - type: web
     name: condotools-frontend
+    env: static
     rootDir: frontend
     buildCommand: npm ci && npm run build
-    publishPath: dist
+    staticPublishPath: dist
     envVars:
       - key: VITE_API_URL
         value: https://condotools-backend.onrender.com/api

@@ -56,7 +56,7 @@ npm run dev
 3. O `render.yaml` criará:
    - **Postgres Database** (`condotools-db`)
    - **Backend Web Service** (Django + Gunicorn)
-   - **Frontend Static Site** (Vite build)
+   - **Frontend Static Site** (serviço `type: web` com `env: static` no Blueprint)
 4. O backend usa no build:
    - `pip install -r requirements.txt && python manage.py collectstatic --noinput && python manage.py migrate`
 5. O backend inicia com:
