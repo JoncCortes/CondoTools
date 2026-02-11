@@ -1,0 +1,22 @@
+export function extractApiError(error) {
+  const status = error?.response?.status
+  const data = error?.response?.data
+
+  if (status === 403) return 'Você não tem permissão para essa ação.'
+  if (status === 401) return 'Sessão expirada. Faça login novamente.'
+
+  if (typeof data === 'string') return data
+  if (data?.detail) return data.detail
+
+  if (data && typeof data === 'object') {
+    const parts = []
+    for (const [key, value] of Object.entries(data)) {
+      if (Array.isArray(value)) parts.push(`${key}: ${value.join(', ')}`)
+      else if (typeof value === 'string') parts.push(`${key}: ${value}`)
+      else if (value && typeof value === 'object') parts.push(`${key}: ${JSON.stringify(value)}`)
+    }
+    if (parts.length) return parts.join(' | ')
+  }
+
+  return 'Falha na requisição.'
+}
