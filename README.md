@@ -61,6 +61,13 @@ npm run dev
 - O frontend envia `X-CONDOMINIUM-ID` automaticamente para recursos condo-scoped.
 - Sem condomínio ativo, páginas condo-scoped ficam vazias e operações de criação retornam erro claro.
 
+
+## CORS e header customizado multi-tenant
+- O backend usa `django-cors-headers` com `CorsMiddleware` no topo da pilha de middlewares.
+- `CORS_ALLOWED_ORIGINS` já inclui `https://condotools-frontend.onrender.com` e pode ser sobrescrito por env var.
+- `CORS_ALLOWED_ORIGIN_REGEXES` também pode ser configurado por env var para cenários com subdomínios dinâmicos.
+- O header `x-condominium-id` está liberado em `CORS_ALLOW_HEADERS`, permitindo preflight/OPTIONS para chamadas multi-tenant do frontend.
+
 ## Deploy Render
 1. Push no GitHub
 2. New + Blueprint

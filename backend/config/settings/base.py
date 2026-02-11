@@ -3,6 +3,7 @@ from pathlib import Path
 import os
 
 import dj_database_url
+from corsheaders.defaults import default_headers
 
 BASE_DIR = Path(__file__).resolve().parents[2]
 
@@ -42,8 +43,8 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
-    "whitenoise.middleware.WhiteNoiseMiddleware",
     "corsheaders.middleware.CorsMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -85,7 +86,22 @@ STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
-CORS_ALLOWED_ORIGINS = [x.strip() for x in os.getenv("CORS_ALLOWED_ORIGINS", "http://localhost:5173").split(",") if x.strip()]
+CORS_ALLOWED_ORIGINS = [
+    x.strip()
+    for x in os.getenv(
+        "CORS_ALLOWED_ORIGINS",
+        "http://localhost:5173,https://condotools-frontend.onrender.com",
+    ).split(",")
+    if x.strip()
+]
+CORS_ALLOWED_ORIGIN_REGEXES = [
+    x.strip()
+    for x in os.getenv("CORS_ALLOWED_ORIGIN_REGEXES", "").split(",")
+    if x.strip()
+]
+CORS_ALLOW_HEADERS = list(default_headers) + [
+    "x-condominium-id",
+]
 
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": ("rest_framework_simplejwt.authentication.JWTAuthentication",),
