@@ -23,8 +23,8 @@ class Command(BaseCommand):
             document="12.345.678/0001-90",
             defaults={"name": "Condomínio Aurora", "address": "Rua Central, 100"},
         )
-        unit101, _ = Unit.objects.get_or_create(condominium=condo, code="101", block="A")
-        unit102, _ = Unit.objects.get_or_create(condominium=condo, code="102", block="A")
+        unit101, _ = Unit.objects.get_or_create(condominium=condo, number="101", block="A", defaults={"code": "A-101"})
+        unit102, _ = Unit.objects.get_or_create(condominium=condo, number="102", block="A", defaults={"code": "A-102"})
 
         admin, _ = User.objects.get_or_create(
             email="admin@platform.com",

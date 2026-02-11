@@ -1,4 +1,4 @@
-from rest_framework import permissions
+from rest_framework import filters, permissions
 
 from apps.common.permissions import HasAnyRole
 from apps.common.viewsets import BaseCondoViewSet
@@ -12,7 +12,9 @@ class UnitPermission(HasAnyRole):
 
 
 class UnitViewSet(BaseCondoViewSet):
-    queryset = Unit.objects.all()
+    queryset = Unit.objects.prefetch_related("residents")
     serializer_class = UnitSerializer
     permission_classes = [permissions.IsAuthenticated, UnitPermission]
-    search_fields = ["code", "block"]
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
+    search_fields = ["number", "block", "code"]
+    ordering_fields = ["number", "block", "created_at"]

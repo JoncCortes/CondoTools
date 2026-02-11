@@ -5,18 +5,22 @@ export function extractApiError(error) {
   if (status === 403) return 'Você não tem permissão para essa ação.'
   if (status === 401) return 'Sessão expirada. Faça login novamente.'
 
-  if (typeof data === 'string') return data
+  if (typeof data === 'string' && data.trim()) return data
   if (data?.detail) return data.detail
 
   if (data && typeof data === 'object') {
     const parts = []
     for (const [key, value] of Object.entries(data)) {
-      if (Array.isArray(value)) parts.push(`${key}: ${value.join(', ')}`)
-      else if (typeof value === 'string') parts.push(`${key}: ${value}`)
-      else if (value && typeof value === 'object') parts.push(`${key}: ${JSON.stringify(value)}`)
+      if (Array.isArray(value) && value.length) parts.push(`${key}: ${value.join(', ')}`)
+      else if (typeof value === 'string' && value.trim()) parts.push(`${key}: ${value}`)
+      else if (value && typeof value === 'object') {
+        const nested = Object.values(value).flat().filter(Boolean)
+        if (nested.length) parts.push(`${key}: ${nested.join(', ')}`)
+      }
     }
     if (parts.length) return parts.join(' | ')
   }
 
-  return 'Falha na requisição.'
+  if (status) return `Não foi possível concluir a solicitação (HTTP ${status}).`
+  return 'Não foi possível concluir a solicitação.'
 }

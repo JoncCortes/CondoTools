@@ -5,6 +5,8 @@ import { api } from '../api/client'
 import { staticMenuByRole } from '../constants/roles'
 import { useAuthStore } from '../store/authStore'
 
+const roleLabel = { PLATFORM_ADMIN: 'Admin da Plataforma', SINDICO: 'Síndico', PORTEIRO: 'Porteiro', MORADOR: 'Morador' }
+
 const labels = {
   '/dashboard': 'Dashboard',
   '/units': 'Unidades',
@@ -54,10 +56,10 @@ export function AppLayout() {
       <main>
         <header className="topbar">
           <div className="top-left">
-            <span>{user?.email} • {user?.role}</span>
+            <span>{user?.email} • {roleLabel[user?.role] || user?.role}</span>
             {user?.role === 'PLATFORM_ADMIN' && (
               <select value={activeCondominiumId || ''} onChange={(e) => setActiveCondominium(e.target.value || null)}>
-                <option value="">Selecione condomínio ativo</option>
+                <option value="">Selecione o condomínio ativo</option>
                 {condos.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
               </select>
             )}

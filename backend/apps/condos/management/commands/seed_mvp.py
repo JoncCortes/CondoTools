@@ -15,8 +15,8 @@ class Command(BaseCommand):
             defaults={"name": "Condomínio Aurora", "address": "Rua das Flores, 100"},
         )
 
-        unit101, _ = Unit.objects.get_or_create(condominium=condo, code="101", block="A")
-        unit102, _ = Unit.objects.get_or_create(condominium=condo, code="102", block="A")
+        unit101, _ = Unit.objects.get_or_create(condominium=condo, number="101", block="A", code="A-101")
+        unit102, _ = Unit.objects.get_or_create(condominium=condo, number="102", block="A", code="A-102")
 
         sindico, _ = User.objects.get_or_create(
             username="sindico",

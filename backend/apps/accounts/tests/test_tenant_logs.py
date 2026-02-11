@@ -16,8 +16,8 @@ class TenantAndAuditFlowsTests(TestCase):
 
         self.condo_a = Condominium.objects.create(name="Condo A", document="11", address="Rua A")
         self.condo_b = Condominium.objects.create(name="Condo B", document="22", address="Rua B")
-        self.unit_a = Unit.objects.create(condominium=self.condo_a, code="101", block="A")
-        self.unit_b = Unit.objects.create(condominium=self.condo_b, code="201", block="B")
+        self.unit_a = Unit.objects.create(condominium=self.condo_a, number="101", block="A", code="A-101")
+        self.unit_b = Unit.objects.create(condominium=self.condo_b, number="201", block="B", code="B-201")
 
         self.platform_admin = self.user_model.objects.create_user(
             email="admin@test.com",

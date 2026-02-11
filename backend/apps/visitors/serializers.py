@@ -4,6 +4,8 @@ from .models import Visitor, VisitorAuditLog
 
 
 class VisitorSerializer(serializers.ModelSerializer):
+    unit_display = serializers.CharField(source="unit.display_name", read_only=True)
+
     class Meta:
         model = Visitor
         fields = "__all__"

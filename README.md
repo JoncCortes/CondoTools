@@ -74,3 +74,21 @@ No Shell do backend:
 python manage.py migrate
 python manage.py seed
 ```
+
+## UX padronizada e formulários guiados
+- A tela de **Unidades** agora usa campos humanos: **Número da unidade**, **Bloco/Torre**, **Andar** e **Observações**.
+- O campo técnico `code` foi mantido apenas para compatibilidade interna e é preenchido automaticamente (`Bloco-Número`).
+- Formulários das entidades principais priorizam `select` para relacionamentos (ex.: unidade, morador, área comum), evitando digitação manual de IDs.
+
+## Configurações (somente Admin da Plataforma)
+A rota `/settings` foi reorganizada em abas:
+1. **Condomínios**: CRUD simplificado com seleção de condomínio ativo.
+2. **Usuários**: criação com dropdowns de **Perfil** e **Condomínio**.
+3. **Assistente**: fluxo guiado em 3 passos:
+   - Escolher/criar condomínio.
+   - Criar primeiro síndico.
+   - Criar unidades em lote por intervalo ou lista.
+
+## Assistente (API)
+- `POST /api/condominiums/wizard/setup/`: cria (ou usa) condomínio e cadastra o primeiro síndico.
+- `POST /api/condominiums/{id}/bulk-units/`: criação em lote de unidades via intervalo (`mode=range`) ou lista (`mode=list`).

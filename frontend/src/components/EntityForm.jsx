@@ -2,7 +2,7 @@ import { useMemo } from 'react'
 
 export function EntityForm({ fields, values, onChange, onSubmit, submitLabel = 'Salvar', loading }) {
   const hasErrors = useMemo(
-    () => fields.some((f) => f.required && !values[f.name]),
+    () => fields.some((f) => f.required && !String(values[f.name] ?? '').trim()),
     [fields, values],
   )
 
@@ -17,6 +17,16 @@ export function EntityForm({ fields, values, onChange, onSubmit, submitLabel = '
               onChange={(e) => onChange(field.name, e.target.value)}
               placeholder={field.label}
             />
+          ) : field.type === 'select' ? (
+            <select
+              value={values[field.name] ?? ''}
+              onChange={(e) => onChange(field.name, e.target.value || null)}
+            >
+              <option value="">Selecione</option>
+              {(field.options || []).map((opt) => (
+                <option key={opt.value} value={opt.value}>{opt.label}</option>
+              ))}
+            </select>
           ) : (
             <input
               type={field.type || 'text'}

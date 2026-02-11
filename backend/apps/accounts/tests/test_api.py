@@ -20,8 +20,8 @@ class AuthAndPermissionTests(TestCase):
             email="porteiro@test.com", password="123456", role="PORTEIRO", condominium=self.condo_a
         )
 
-        Unit.objects.create(condominium=self.condo_a, code="101", block="A")
-        Unit.objects.create(condominium=self.condo_b, code="201", block="B")
+        Unit.objects.create(condominium=self.condo_a, number="101", block="A", code="A-101")
+        Unit.objects.create(condominium=self.condo_b, number="201", block="B", code="B-201")
 
     def auth(self, email, password="123456"):
         resp = self.client.post("/api/auth/token/", {"email": email, "password": password}, format="json")
@@ -42,9 +42,9 @@ class AuthAndPermissionTests(TestCase):
         response = self.client.get("/api/units/")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["count"], 1)
-        self.assertEqual(response.data["results"][0]["code"], "101")
+        self.assertEqual(response.data["results"][0]["display_name"], "Bloco A - 101")
 
     def test_doorman_cannot_create_unit(self):
         self.auth("porteiro@test.com")
-        response = self.client.post("/api/units/", {"code": "999", "block": "Z"}, format="json")
+        response = self.client.post("/api/units/", {"number": "999", "block": "Z"}, format="json")
         self.assertEqual(response.status_code, 403)
